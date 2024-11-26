@@ -14,26 +14,23 @@
  * limitations under the License.
  */
 
-package test
+package accounts
 
 import (
-	"encoding/json"
-	"os"
+	"context"
 
 	"github.com/coinbase-samples/advanced-trade-sdk-go/client"
-	"github.com/coinbase-samples/advanced-trade-sdk-go/credentials"
 )
 
-func setupClient() (client.RestClient, error) {
-	credentials := &credentials.Credentials{}
-	if err := json.Unmarshal([]byte(os.Getenv("ADV_CREDENTIALS")), credentials); err != nil {
-		return nil, err
-	}
+type AccountsService interface {
+	ListAccounts(ctx context.Context, request *ListAccountsRequest) (*ListAccountsResponse, error)
+	GetAccount(ctx context.Context, request *GetAccountRequest) (*GetAccountResponse, error)
+}
 
-	httpClient, err := client.DefaultHttpClient()
-	if err != nil {
-		return nil, err
-	}
-	restClient := client.NewRestClient(credentials, httpClient)
-	return restClient, nil
+func NewAccountsService(c client.RestClient) AccountsService {
+	return &accountsServiceImpl{client: c}
+}
+
+type accountsServiceImpl struct {
+	client client.RestClient
 }

@@ -18,8 +18,10 @@ package test
 
 import (
 	"context"
-	adv "github.com/coinbase-samples/advanced-trade-sdk-go"
 	"testing"
+
+	"github.com/coinbase-samples/advanced-trade-sdk-go/model"
+	"github.com/coinbase-samples/advanced-trade-sdk-go/orders"
 )
 
 func TestCreateOrderPreview(t *testing.T) {
@@ -28,12 +30,13 @@ func TestCreateOrderPreview(t *testing.T) {
 		t.Fatalf("Error setting up client: %v", err)
 	}
 
-	ctx := context.Background()
-	response, err := client.CreateOrderPreview(ctx, &adv.CreateOrderPreviewRequest{
+	service := orders.NewOrdersService(client)
+
+	response, err := service.CreateOrderPreview(context.Background(), &orders.CreateOrderPreviewRequest{
 		ProductId: "ETH-USD",
 		Side:      "SELL",
-		OrderConfiguration: adv.OrderConfiguration{
-			LimitLimitGtc: &adv.LimitGtc{
+		OrderConfiguration: model.OrderConfiguration{
+			LimitLimitGtc: &model.LimitGtc{
 				BaseSize:   "0.0001",
 				LimitPrice: "4999",
 			},

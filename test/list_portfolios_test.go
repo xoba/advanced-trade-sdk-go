@@ -18,8 +18,9 @@ package test
 
 import (
 	"context"
-	adv "github.com/coinbase-samples/advanced-trade-sdk-go"
 	"testing"
+
+	"github.com/coinbase-samples/advanced-trade-sdk-go/portfolios"
 )
 
 func TestListPortfolios(t *testing.T) {
@@ -28,8 +29,9 @@ func TestListPortfolios(t *testing.T) {
 		t.Fatalf("Error setting up client: %v", err)
 	}
 
-	ctx := context.Background()
-	response, err := client.ListPortfolios(ctx, &adv.ListPortfoliosRequest{})
+	service := portfolios.NewPortfoliosService(client)
+
+	response, err := service.ListPortfolios(context.Background(), &portfolios.ListPortfoliosRequest{})
 
 	if err != nil {
 		t.Errorf("Failed to list portfolios: %v", err)

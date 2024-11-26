@@ -14,26 +14,26 @@
  * limitations under the License.
  */
 
-package test
+package utils
 
 import (
-	"encoding/json"
-	"os"
-
-	"github.com/coinbase-samples/advanced-trade-sdk-go/client"
-	"github.com/coinbase-samples/advanced-trade-sdk-go/credentials"
+	"github.com/coinbase-samples/advanced-trade-sdk-go/model"
+	"github.com/coinbase-samples/core-go"
 )
 
-func setupClient() (client.RestClient, error) {
-	credentials := &credentials.Credentials{}
-	if err := json.Unmarshal([]byte(os.Getenv("ADV_CREDENTIALS")), credentials); err != nil {
-		return nil, err
+func AppendPaginationParams(v string, p *model.PaginationParams) string {
+
+	if p == nil {
+		return v
 	}
 
-	httpClient, err := client.DefaultHttpClient()
-	if err != nil {
-		return nil, err
+	if len(p.Cursor) > 0 {
+		v = core.AppendHttpQueryParam(v, "cursor", p.Cursor)
 	}
-	restClient := client.NewRestClient(credentials, httpClient)
-	return restClient, nil
+
+	if len(p.Limit) > 0 {
+		v = core.AppendHttpQueryParam(v, "limit", p.Limit)
+	}
+
+	return v
 }

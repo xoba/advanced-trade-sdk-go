@@ -14,26 +14,36 @@
  * limitations under the License.
  */
 
-package test
+package credentials
 
 import (
 	"encoding/json"
+	"fmt"
 	"os"
-
-	"github.com/coinbase-samples/advanced-trade-sdk-go/client"
-	"github.com/coinbase-samples/advanced-trade-sdk-go/credentials"
 )
 
-func setupClient() (client.RestClient, error) {
-	credentials := &credentials.Credentials{}
-	if err := json.Unmarshal([]byte(os.Getenv("ADV_CREDENTIALS")), credentials); err != nil {
+type Credentials struct {
+	AccessKey     string `json:"accessKey"`
+	PrivatePemKey string `json:"privatePemKey"`
+	PortfolioId   string `json:"portfolioId"`
+}
+
+func UnmarshalCredentials(b []byte) (*Credentials, error) {
+
+	c := &Credentials{}
+	if err := json.Unmarshal(b, c); err != nil {
 		return nil, err
 	}
 
-	httpClient, err := client.DefaultHttpClient()
-	if err != nil {
-		return nil, err
+	return c, nil
+}
+
+func ReadEnvCredentials(variableName string) (*Credentials, error) {
+
+	v := os.Getenv(variableName)
+	if len(v) == 0 {
+		return nil, fmt.Errorf("%s not set as environment variable", variableName)
 	}
-	restClient := client.NewRestClient(credentials, httpClient)
-	return restClient, nil
+
+	return UnmarshalCredentials([]byte(v))
 }

@@ -14,26 +14,24 @@
  * limitations under the License.
  */
 
-package test
+package converts
 
 import (
-	"encoding/json"
-	"os"
+	"context"
 
 	"github.com/coinbase-samples/advanced-trade-sdk-go/client"
-	"github.com/coinbase-samples/advanced-trade-sdk-go/credentials"
 )
 
-func setupClient() (client.RestClient, error) {
-	credentials := &credentials.Credentials{}
-	if err := json.Unmarshal([]byte(os.Getenv("ADV_CREDENTIALS")), credentials); err != nil {
-		return nil, err
-	}
+type ConvertsService interface {
+	CommitConvertQuote(ctx context.Context, request *CommitConvertQuoteRequest) (*CommitConvertQuoteResponse, error)
+	CreateConvertQuote(ctx context.Context, request *CreateConvertQuoteRequest) (*CreateConvertQuoteResponse, error)
+	GetConvertTrade(ctx context.Context, request *GetConvertTradeRequest) (*GetConvertTradeResponse, error)
+}
 
-	httpClient, err := client.DefaultHttpClient()
-	if err != nil {
-		return nil, err
-	}
-	restClient := client.NewRestClient(credentials, httpClient)
-	return restClient, nil
+func NewConvertsService(c client.RestClient) ConvertsService {
+	return &convertsServiceImpl{client: c}
+}
+
+type convertsServiceImpl struct {
+	client client.RestClient
 }

@@ -18,8 +18,11 @@ package test
 
 import (
 	"context"
-	adv "github.com/coinbase-samples/advanced-trade-sdk-go"
+	"fmt"
 	"testing"
+	"time"
+
+	"github.com/coinbase-samples/advanced-trade-sdk-go/portfolios"
 )
 
 func TestCreatePortfolio(t *testing.T) {
@@ -28,9 +31,10 @@ func TestCreatePortfolio(t *testing.T) {
 		t.Fatalf("Error setting up client: %v", err)
 	}
 
-	ctx := context.Background()
-	response, err := client.CreatePortfolio(ctx, &adv.CreatePortfolioRequest{
-		Name: "test_portfolio11111",
+	service := portfolios.NewPortfoliosService(client)
+
+	response, err := service.CreatePortfolio(context.Background(), &portfolios.CreatePortfolioRequest{
+		Name: fmt.Sprintf("test_portfolio-%d", time.Now().Unix()),
 	})
 
 	if err != nil {

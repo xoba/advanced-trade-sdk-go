@@ -22,15 +22,20 @@ To use the *Advanced Trade Go SDK*, initialize the [Credentials](credentials.go)
 enabled. Ensure that Advanced Trade API credentials are stored in a secure manner.
 
 ```
-credentials := &adv.Credentials{}
+credentials := &credentials.Credentials{}
 if err := json.Unmarshal([]byte(os.Getenv("ADV_CREDENTIALS")), credentials); err != nil {
     return nil, fmt.Errorf("unable to deserialize advanced trade credentials JSON: %w", err)
 }
 
-client := adv.NewClient(credentials, http.Client{})
+httpClient, err := client.DefaultHttpClient()
+if err != nil {
+    panic(fmt.Sprintf("unable to load default http client: %v", err))
+}
+
+restClient := client.NewRestClient(credentials, httpClient)
 ```
 
-There are convenience functions to read the credentials as an environment variable (adv.ReadEnvCredentials) and to deserialize the JSON structure (adv.UnmarshalCredentials) if pulled from a different source. The JSON format expected by both is:
+There are convenience functions to read the credentials as an environment variable (credentials.ReadEnvCredentials) and to deserialize the JSON structure (credentials.UnmarshalCredentials) if pulled from a different source. The JSON format expected by both is:
 
 ```
 {
@@ -41,12 +46,15 @@ There are convenience functions to read the credentials as an environment variab
 
 Coinbase Advanced Trade API credentials can be created in the [CDP web portal](https://portal.cdp.coinbase.com/). 
 
-Once the client is initialized, make the desired call. For example, to [list portfolios](https://github.com/coinbase-samples/advanced-trade-sdk-go/blob/main/list_portfolios.go),
-pass in the request object, check for an error, and if nil, process the response.
+Once the client is initialized, initialize a service to make the desired call. For example, to [list portfolios](https://github.com/coinbase-samples/advanced-trade-sdk-go/blob/main/list_portfolios.go),
+create the service, pass in the request object, check for an error, and if nil, process the response.
 
 
 ```
-response, err := client.ListPortfolios(ctx, &adv.ListPortfoliosRequest{})
+service := portfolios.NewPortfoliosService(restClient)
+
+
+response, err := service.ListPortfolios(ctx, &portfolios.ListPortfoliosRequest{})
 ```
 
 ## Build
@@ -54,5 +62,5 @@ response, err := client.ListPortfolios(ctx, &adv.ListPortfoliosRequest{})
 To build the sample library, ensure that [Go](https://go.dev/) 1.19+ is installed and then run:
 
 ```bash
-go build *.go
+go build ./...
 ```

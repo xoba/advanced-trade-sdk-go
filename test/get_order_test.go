@@ -18,9 +18,10 @@ package test
 
 import (
 	"context"
-	adv "github.com/coinbase-samples/advanced-trade-sdk-go"
 	"testing"
 	"time"
+
+	"github.com/coinbase-samples/advanced-trade-sdk-go/orders"
 )
 
 func TestGetOrder(t *testing.T) {
@@ -32,7 +33,9 @@ func TestGetOrder(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	ordersResponse, err := client.ListOrders(ctx, &adv.ListOrdersRequest{
+	service := orders.NewOrdersService(client)
+
+	ordersResponse, err := service.ListOrders(ctx, &orders.ListOrdersRequest{
 		OrderStatus: []string{"FILLED"},
 	})
 
@@ -46,14 +49,14 @@ func TestGetOrder(t *testing.T) {
 
 	firstOrder := ordersResponse.Orders[0]
 
-	testGetSpecificOrder(t, client, firstOrder.OrderId)
+	testGetSpecificOrder(t, service, firstOrder.OrderId)
 }
 
-func testGetSpecificOrder(t *testing.T, client *adv.Client, orderId string) {
+func testGetSpecificOrder(t *testing.T, svc orders.OrdersService, orderId string) {
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancel()
 
-	response, err := client.GetOrder(ctx, &adv.GetOrderRequest{
+	response, err := svc.GetOrder(ctx, &orders.GetOrderRequest{
 		OrderId: orderId,
 	})
 

@@ -14,26 +14,22 @@
  * limitations under the License.
  */
 
-package test
+package fees
 
 import (
-	"encoding/json"
-	"os"
+	"context"
 
 	"github.com/coinbase-samples/advanced-trade-sdk-go/client"
-	"github.com/coinbase-samples/advanced-trade-sdk-go/credentials"
 )
 
-func setupClient() (client.RestClient, error) {
-	credentials := &credentials.Credentials{}
-	if err := json.Unmarshal([]byte(os.Getenv("ADV_CREDENTIALS")), credentials); err != nil {
-		return nil, err
-	}
+type FeesService interface {
+	GetTransactionsSummary(ctx context.Context, request *GetTransactionsSummaryRequest) (*GetTransactionsSummaryResponse, error)
+}
 
-	httpClient, err := client.DefaultHttpClient()
-	if err != nil {
-		return nil, err
-	}
-	restClient := client.NewRestClient(credentials, httpClient)
-	return restClient, nil
+func NewFeesService(c client.RestClient) FeesService {
+	return &feesServiceImpl{client: c}
+}
+
+type feesServiceImpl struct {
+	client client.RestClient
 }

@@ -14,26 +14,23 @@
  * limitations under the License.
  */
 
-package test
+package paymentmethods
 
 import (
-	"encoding/json"
-	"os"
+	"context"
 
 	"github.com/coinbase-samples/advanced-trade-sdk-go/client"
-	"github.com/coinbase-samples/advanced-trade-sdk-go/credentials"
 )
 
-func setupClient() (client.RestClient, error) {
-	credentials := &credentials.Credentials{}
-	if err := json.Unmarshal([]byte(os.Getenv("ADV_CREDENTIALS")), credentials); err != nil {
-		return nil, err
-	}
+type PaymentMethodsService interface {
+	GetPaymentMethod(ctx context.Context, request *GetPaymentMethodRequest) (*GetPaymentMethodResponse, error)
+	ListPaymentMethods(ctx context.Context, request *ListPaymentMethodsRequest) (*ListPaymentMethodsResponse, error)
+}
 
-	httpClient, err := client.DefaultHttpClient()
-	if err != nil {
-		return nil, err
-	}
-	restClient := client.NewRestClient(credentials, httpClient)
-	return restClient, nil
+func NewPaymentMethodsService(c client.RestClient) PaymentMethodsService {
+	return &paymentMethodsServiceImpl{client: c}
+}
+
+type paymentMethodsServiceImpl struct {
+	client client.RestClient
 }
