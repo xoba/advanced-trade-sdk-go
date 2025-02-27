@@ -1,5 +1,5 @@
 /**
- * Copyright 2024-present Coinbase Global, Inc.
+ * Copyright 2025-present Coinbase Global, Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,31 +20,27 @@ import (
 	"context"
 
 	"github.com/coinbase-samples/advanced-trade-sdk-go/client"
-	"github.com/coinbase-samples/advanced-trade-sdk-go/model"
 	"github.com/coinbase-samples/core-go"
 )
 
-type AllocatePortfolioRequest struct {
-	PortfolioUuid string `json:"portfolio_uuid"`
-	Symbol        string `json:"string"`
-	Amount        string `json:"amount"`
-	Currency      string `json:"currency"`
+type OptInOutMultiAssetCollateralRequest struct {
+	PortfolioUuid               string `json:"portfolio_uuid"`
+	MultiAssetCollateralEnabled bool   `json:"multi_asset_collateral_enabled"`
 }
 
-type AllocatePortfolioResponse struct {
-	Description string                    `json:"description"`
-	Schema      *model.Schema             `json:"schema"`
-	Request     *AllocatePortfolioRequest `json:"request"`
+type OptInOutMultiAssetCollateralResponse struct {
+	MultiAssetCollateralEnabled bool                                 `json:"multi_asset_collateral_enabled"`
+	Request                     *OptInOutMultiAssetCollateralRequest `json:"request"`
 }
 
-func (s productsServiceImpl) AllocatePortfolio(
+func (s productsServiceImpl) OptInOutMultiAssetCollateral(
 	ctx context.Context,
-	request *AllocatePortfolioRequest,
-) (*AllocatePortfolioResponse, error) {
+	request *OptInOutMultiAssetCollateralRequest,
+) (*OptInOutMultiAssetCollateralResponse, error) {
 
-	path := "/brokerage/intx/allocate"
+	path := "/brokerage/intx/multi_asset_collateral"
 
-	response := &AllocatePortfolioResponse{Request: request}
+	response := &OptInOutMultiAssetCollateralResponse{Request: request}
 
 	if err := core.HttpPost(
 		ctx,

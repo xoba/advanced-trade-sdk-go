@@ -18,7 +18,6 @@ package orders
 
 import (
 	"context"
-	"fmt"
 
 	"github.com/coinbase-samples/advanced-trade-sdk-go/client"
 	"github.com/coinbase-samples/advanced-trade-sdk-go/model"
@@ -44,7 +43,7 @@ func (s ordersServiceImpl) ClosePosition(
 	request *ClosePositionRequest,
 ) (*ClosePositionResponse, error) {
 
-	path := fmt.Sprint("/brokerage/orders/close_position")
+	path := "/brokerage/orders/close_position"
 
 	response := &ClosePositionResponse{Request: request}
 

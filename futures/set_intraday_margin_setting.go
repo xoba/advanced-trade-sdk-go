@@ -1,5 +1,5 @@
 /**
- * Copyright 2024-present Coinbase Global, Inc.
+ * Copyright 2025-present Coinbase Global, Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,37 +14,31 @@
  * limitations under the License.
  */
 
-package perpetuals
+package futures
 
 import (
 	"context"
 
 	"github.com/coinbase-samples/advanced-trade-sdk-go/client"
-	"github.com/coinbase-samples/advanced-trade-sdk-go/model"
 	"github.com/coinbase-samples/core-go"
 )
 
-type AllocatePortfolioRequest struct {
-	PortfolioUuid string `json:"portfolio_uuid"`
-	Symbol        string `json:"string"`
-	Amount        string `json:"amount"`
-	Currency      string `json:"currency"`
+type SetIntradayMarginSettingRequest struct {
+	Setting string `json:"setting"`
 }
 
-type AllocatePortfolioResponse struct {
-	Description string                    `json:"description"`
-	Schema      *model.Schema             `json:"schema"`
-	Request     *AllocatePortfolioRequest `json:"request"`
+type SetIntradayMarginSettingResponse struct {
+	Request *SetIntradayMarginSettingRequest `json:"request"`
 }
 
-func (s productsServiceImpl) AllocatePortfolio(
+func (s futuresServiceImpl) SetIntradayMarginSetting(
 	ctx context.Context,
-	request *AllocatePortfolioRequest,
-) (*AllocatePortfolioResponse, error) {
+	request *SetIntradayMarginSettingRequest,
+) (*SetIntradayMarginSettingResponse, error) {
 
-	path := "/brokerage/intx/allocate"
+	path := "/brokerage/cfm/intraday/margin_setting"
 
-	response := &AllocatePortfolioResponse{Request: request}
+	response := &SetIntradayMarginSettingResponse{Request: request}
 
 	if err := core.HttpPost(
 		ctx,

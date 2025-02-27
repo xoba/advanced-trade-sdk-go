@@ -25,11 +25,13 @@ import (
 )
 
 type ListOrdersRequest struct {
-	ProductId            string                  `json:"product_id,omitempty"`
+	OrderIds             []string                `json:"order_ids,omitempty"`
+	ProductIds           []string                `json:"product_ids,omitempty"`
 	OrderStatus          []string                `json:"order_status,omitempty"`
+	TimeInForces         []string                `json:"time_in_forces,omitempty"`
 	StartDate            string                  `json:"start_date,omitempty"`
 	EndDate              string                  `json:"end_date,omitempty"`
-	OrderType            string                  `json:"order_type,omitempty"`
+	OrderTypes           []string                `json:"order_types,omitempty"`
 	OrderSide            string                  `json:"order_side,omitempty"`
 	ProductType          string                  `json:"product_type,omitempty"`
 	OrderPlacementSource string                  `json:"order_placement_source,omitempty"`
@@ -55,11 +57,17 @@ func (s ordersServiceImpl) ListOrders(
 
 	var queryParams string
 
-	if len(request.ProductId) > 0 {
-		queryParams = core.AppendHttpQueryParam(queryParams, "product_id", request.ProductId)
+	for _, orderId := range request.OrderIds {
+		queryParams = core.AppendHttpQueryParam(queryParams, "order_ids", orderId)
+	}
+	for _, productId := range request.ProductIds {
+		queryParams = core.AppendHttpQueryParam(queryParams, "product_ids", productId)
 	}
 	for _, status := range request.OrderStatus {
 		queryParams = core.AppendHttpQueryParam(queryParams, "order_status", status)
+	}
+	for _, timeInForce := range request.TimeInForces {
+		queryParams = core.AppendHttpQueryParam(queryParams, "time_in_forces", timeInForce)
 	}
 	if len(request.StartDate) > 0 {
 		queryParams = core.AppendHttpQueryParam(queryParams, "start_date", request.StartDate)
@@ -67,8 +75,8 @@ func (s ordersServiceImpl) ListOrders(
 	if len(request.EndDate) > 0 {
 		queryParams = core.AppendHttpQueryParam(queryParams, "end_date", request.EndDate)
 	}
-	if len(request.OrderType) > 0 {
-		queryParams = core.AppendHttpQueryParam(queryParams, "order_type", request.OrderType)
+	for _, orderType := range request.OrderTypes {
+		queryParams = core.AppendHttpQueryParam(queryParams, "order_types", orderType)
 	}
 	if len(request.OrderSide) > 0 {
 		queryParams = core.AppendHttpQueryParam(queryParams, "order_side", request.OrderSide)

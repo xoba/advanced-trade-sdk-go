@@ -1,5 +1,5 @@
 /**
- * Copyright 2024-present Coinbase Global, Inc.
+ * Copyright 2025-present Coinbase Global, Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package perpetuals
+package futures
 
 import (
 	"context"
@@ -24,29 +24,25 @@ import (
 	"github.com/coinbase-samples/core-go"
 )
 
-type AllocatePortfolioRequest struct {
-	PortfolioUuid string `json:"portfolio_uuid"`
-	Symbol        string `json:"string"`
-	Amount        string `json:"amount"`
-	Currency      string `json:"currency"`
+type GetCurrentMarginWindowRequest struct {
+	MarginProfileType string `json:"margin_profile_type"`
 }
 
-type AllocatePortfolioResponse struct {
-	Description string                    `json:"description"`
-	Schema      *model.Schema             `json:"schema"`
-	Request     *AllocatePortfolioRequest `json:"request"`
+type GetCurrentMarginWindowResponse struct {
+	MarginSettings *model.MarginSettings          `json:"margin_settings"`
+	Request        *GetCurrentMarginWindowRequest `json:"request"`
 }
 
-func (s productsServiceImpl) AllocatePortfolio(
+func (s futuresServiceImpl) GetCurrentMarginWindow(
 	ctx context.Context,
-	request *AllocatePortfolioRequest,
-) (*AllocatePortfolioResponse, error) {
+	request *GetCurrentMarginWindowRequest,
+) (*GetCurrentMarginWindowResponse, error) {
 
-	path := "/brokerage/intx/allocate"
+	path := "/brokerage/cfm/intraday/current_margin_window"
 
-	response := &AllocatePortfolioResponse{Request: request}
+	response := &GetCurrentMarginWindowResponse{Request: request}
 
-	if err := core.HttpPost(
+	if err := core.HttpGet(
 		ctx,
 		s.client,
 		path,

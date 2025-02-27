@@ -18,7 +18,6 @@ package futures
 
 import (
 	"context"
-	"fmt"
 
 	"github.com/coinbase-samples/advanced-trade-sdk-go/client"
 	"github.com/coinbase-samples/advanced-trade-sdk-go/model"
@@ -37,7 +36,7 @@ func (s futuresServiceImpl) ListFuturesPositions(
 	request *ListFuturesPositionsRequest,
 ) (*ListFuturesPositionsResponse, error) {
 
-	path := fmt.Sprint("/brokerage/cfm/positions")
+	path := "/brokerage/cfm/positions"
 
 	response := &ListFuturesPositionsResponse{Request: request}
 

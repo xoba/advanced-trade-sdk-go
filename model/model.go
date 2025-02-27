@@ -29,6 +29,60 @@ type Portfolio struct {
 	Deleted bool   `json:"deleted"`
 }
 
+type Setting struct {
+	Setting string `json:"setting"`
+}
+
+type MarginSetting struct {
+	Description string `json:"description"`
+}
+
+type MarginSettings struct {
+	MarginWindow                                MarginWindow `json:"margin_window"`
+	IsIntradayMarginKillswitchEnabled           bool         `json:"is_intraday_margin_killswitch_enabled"`
+	IsIntradayMarginEnrollmentKillswitchEnabled bool         `json:"is_intraday_margin_enrollment_killswitch_enabled"`
+}
+
+type MarginWindow struct {
+	MarginWindowType string `json:"margin_window_type"`
+	EndTime          string `json:"end_time"`
+}
+
+type IntxBreakdown struct {
+	IntxPortfolioBalances IntxPortfolioBalances `json:"portfolio_balances"`
+}
+
+type IntxPortfolioBalances struct {
+	PortfolioUuid        string    `json:"portfolio_uuid"`
+	Balances             []Balance `json:"balances"`
+	IsMarginLimitReached bool      `json:"is_margin_limit_reached"`
+}
+
+type Balance struct {
+	Asset                        Asset  `json:"asset"`
+	Quantity                     string `json:"quantity"`
+	Hold                         string `json:"hold"`
+	TransferHold                 string `json:"transfer_hold"`
+	CollateralValue              string `json:"collateral_value"`
+	CollateralWeight             string `json:"collateral_weight"`
+	MaxWithdrawAmount            string `json:"max_withdraw_amount"`
+	Loan                         string `json:"loan"`
+	LoanCollateralRequirementUsd string `json:"loan_collateral_requirement_usd"`
+	PledgedQuantity              string `json:"pledged_quantity"`
+}
+
+type Asset struct {
+	AssetId                          string `json:"asset_id"`
+	AssetUuid                        string `json:"asset_uuid"`
+	AssetName                        string `json:"asset_name"`
+	Status                           string `json:"status"`
+	CollateralWeight                 string `json:"collateral_weight"`
+	AccountCollateralLimit           string `json:"account_collateral_limit"`
+	EcosystemCollateralLimitBreached bool   `json:"ecosystem_collateral_limit_breached"`
+	AssetIconUrl                     string `json:"asset_icon_url"`
+	SupportedNetworksEnabled         bool   `json:"supported_networks_enabled"`
+}
+
 type CfmFuturesPosition struct {
 	ProductId         string `json:"product_id"`
 	ExpirationTime    string `json:"expiration_time"`
@@ -654,4 +708,12 @@ type IntxPosition struct {
 }
 type IntxSummary struct {
 	AggregatedPnl Amount `json:"aggregated_pnl"`
+}
+
+type ApiKeyPermission struct {
+	CanView       bool   `json:"can_view"`
+	CanTrade      bool   `json:"can_trade"`
+	CanTransfer   bool   `json:"can_transfer"`
+	PortfolioUuid string `json:"portfolio_uuid"`
+	PortfolioType string `json:"portfolio_type"`
 }
