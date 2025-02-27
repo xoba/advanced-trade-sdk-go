@@ -18,7 +18,6 @@ package orders
 
 import (
 	"context"
-	"fmt"
 
 	"github.com/coinbase-samples/advanced-trade-sdk-go/client"
 	"github.com/coinbase-samples/advanced-trade-sdk-go/model"
@@ -39,7 +38,7 @@ func (s ordersServiceImpl) CancelOrders(
 	request *CancelOrdersRequest,
 ) (*CancelOrdersResponse, error) {
 
-	path := fmt.Sprint("/brokerage/orders/batch_cancel")
+	path := "/brokerage/orders/batch_cancel"
 
 	response := &CancelOrdersResponse{Request: request}
 

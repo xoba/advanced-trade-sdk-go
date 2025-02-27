@@ -1,5 +1,5 @@
 /**
- * Copyright 2024-present Coinbase Global, Inc.
+ * Copyright 2025-present Coinbase Global, Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package perpetuals
+package fees
 
 import (
 	"context"
@@ -24,29 +24,23 @@ import (
 	"github.com/coinbase-samples/core-go"
 )
 
-type AllocatePortfolioRequest struct {
-	PortfolioUuid string `json:"portfolio_uuid"`
-	Symbol        string `json:"string"`
-	Amount        string `json:"amount"`
-	Currency      string `json:"currency"`
+type GetApiKeyPermissionsRequest struct{}
+
+type GetApiKeyPermissionsResponse struct {
+	ApiKeyPermission model.ApiKeyPermission       `json:"api_key_permissions"`
+	Request          *GetApiKeyPermissionsRequest `json:"request"`
 }
 
-type AllocatePortfolioResponse struct {
-	Description string                    `json:"description"`
-	Schema      *model.Schema             `json:"schema"`
-	Request     *AllocatePortfolioRequest `json:"request"`
-}
-
-func (s productsServiceImpl) AllocatePortfolio(
+func (s dataApisServiceImpl) GetApiKeyPermissions(
 	ctx context.Context,
-	request *AllocatePortfolioRequest,
-) (*AllocatePortfolioResponse, error) {
+	request *GetApiKeyPermissionsRequest,
+) (*GetApiKeyPermissionsResponse, error) {
 
-	path := "/brokerage/intx/allocate"
+	path := "/brokerage/key_permissions"
 
-	response := &AllocatePortfolioResponse{Request: request}
+	response := &GetApiKeyPermissionsResponse{Request: request}
 
-	if err := core.HttpPost(
+	if err := core.HttpGet(
 		ctx,
 		s.client,
 		path,

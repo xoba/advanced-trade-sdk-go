@@ -18,7 +18,6 @@ package futures
 
 import (
 	"context"
-	"fmt"
 
 	"github.com/coinbase-samples/advanced-trade-sdk-go/client"
 	"github.com/coinbase-samples/core-go"
@@ -36,7 +35,7 @@ func (s futuresServiceImpl) CancelPendingFuturesSweeps(
 	request *CancelPendingFuturesSweepsRequest,
 ) (*CancelPendingFuturesSweepsResponse, error) {
 
-	path := fmt.Sprint("/brokerage/cfm/sweeps")
+	path := "/brokerage/cfm/sweeps"
 
 	response := &CancelPendingFuturesSweepsResponse{Request: request}
 

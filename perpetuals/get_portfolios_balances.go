@@ -1,5 +1,5 @@
 /**
- * Copyright 2024-present Coinbase Global, Inc.
+ * Copyright 2025-present Coinbase Global, Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,35 +18,32 @@ package perpetuals
 
 import (
 	"context"
+	"fmt"
 
 	"github.com/coinbase-samples/advanced-trade-sdk-go/client"
 	"github.com/coinbase-samples/advanced-trade-sdk-go/model"
 	"github.com/coinbase-samples/core-go"
 )
 
-type AllocatePortfolioRequest struct {
+type GetPortfoliosBalancesRequest struct {
 	PortfolioUuid string `json:"portfolio_uuid"`
-	Symbol        string `json:"string"`
-	Amount        string `json:"amount"`
-	Currency      string `json:"currency"`
 }
 
-type AllocatePortfolioResponse struct {
-	Description string                    `json:"description"`
-	Schema      *model.Schema             `json:"schema"`
-	Request     *AllocatePortfolioRequest `json:"request"`
+type GetPortfoliosBalancesResponse struct {
+	IntxBreakdown *model.IntxBreakdown          `json:"intx_breakdown"`
+	Request       *GetPortfoliosBalancesRequest `json:"request"`
 }
 
-func (s productsServiceImpl) AllocatePortfolio(
+func (s productsServiceImpl) GetPortfoliosBalances(
 	ctx context.Context,
-	request *AllocatePortfolioRequest,
-) (*AllocatePortfolioResponse, error) {
+	request *GetPortfoliosBalancesRequest,
+) (*GetPortfoliosBalancesResponse, error) {
 
-	path := "/brokerage/intx/allocate"
+	path := fmt.Sprintf("/brokerage/intx/balances/%s", request.PortfolioUuid)
 
-	response := &AllocatePortfolioResponse{Request: request}
+	response := &GetPortfoliosBalancesResponse{Request: request}
 
-	if err := core.HttpPost(
+	if err := core.HttpGet(
 		ctx,
 		s.client,
 		path,
