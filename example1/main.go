@@ -19,17 +19,28 @@ import (
 
 func main() {
 	// Define command line flags
-	var btcAmount string
-	var usdAmount string
+	var btcAmount float64
+	var usdAmount float64
 	var productId string
+	var useBtc, useUsd bool
 
-	flag.StringVar(&btcAmount, "btc", "", "Amount of BTC to sell (e.g., '0.1')")
-	flag.StringVar(&usdAmount, "usd", "", "USD value of BTC to sell (e.g., '1000')")
+	flag.Float64Var(&btcAmount, "btc", 0, "Amount of BTC to sell (e.g., 0.01)")
+	flag.Float64Var(&usdAmount, "usd", 0, "USD value of BTC to sell (e.g., 1000)")
 	flag.StringVar(&productId, "product", "BTC-USD", "Product ID to trade (default: BTC-USD)")
 	flag.Parse()
 
+	// Determine which flags were actually set by user
+	flag.Visit(func(f *flag.Flag) {
+		if f.Name == "btc" {
+			useBtc = true
+		}
+		if f.Name == "usd" {
+			useUsd = true
+		}
+	})
+
 	// Validate flags
-	if btcAmount == "" && usdAmount == "" {
+	if !useBtc && !useUsd {
 		fmt.Println("Error: You must specify either -btc or -usd amount")
 		fmt.Println("Usage examples:")
 		fmt.Println("  ./example1 -btc 0.01      # Sell 0.01 BTC (maximum allowed)")
@@ -37,7 +48,7 @@ func main() {
 		os.Exit(1)
 	}
 
-	if btcAmount != "" && usdAmount != "" {
+	if useBtc && useUsd {
 		fmt.Println("Error: Specify either -btc or -usd, not both")
 		os.Exit(1)
 	}
@@ -47,26 +58,24 @@ func main() {
 	const MAX_USD_AMOUNT = 1000.0
 
 	// Check BTC safety limit
-	if btcAmount != "" {
-		btcValue, err := strconv.ParseFloat(btcAmount, 64)
-		if err != nil {
-			fmt.Printf("Error: Invalid BTC amount '%s'\n", btcAmount)
+	if useBtc {
+		if btcAmount <= 0 {
+			fmt.Println("Error: BTC amount must be greater than 0")
 			os.Exit(1)
 		}
-		if btcValue > MAX_BTC_AMOUNT {
+		if btcAmount > MAX_BTC_AMOUNT {
 			fmt.Printf("Error: BTC amount exceeds safety limit of %.5f BTC\n", MAX_BTC_AMOUNT)
 			os.Exit(1)
 		}
 	}
 
 	// Check USD safety limit
-	if usdAmount != "" {
-		usdValue, err := strconv.ParseFloat(usdAmount, 64)
-		if err != nil {
-			fmt.Printf("Error: Invalid USD amount '%s'\n", usdAmount)
+	if useUsd {
+		if usdAmount <= 0 {
+			fmt.Println("Error: USD amount must be greater than 0")
 			os.Exit(1)
 		}
-		if usdValue > MAX_USD_AMOUNT {
+		if usdAmount > MAX_USD_AMOUNT {
 			fmt.Printf("Error: USD amount exceeds safety limit of $%.2f\n", MAX_USD_AMOUNT)
 			os.Exit(1)
 		}
@@ -113,26 +122,29 @@ func main() {
 	}
 
 	var orderTypeDesc string
-	if btcAmount != "" {
+	if useBtc {
 		// For BTC amount, directly use BaseSize (already correct)
-		orderConfig.MarketMarketIoc.BaseSize = btcAmount
-		orderTypeDesc = fmt.Sprintf("%s BTC", btcAmount)
+		// Format BTC amount to 8 decimal places (Bitcoin's standard precision)
+		btcSizeStr := fmt.Sprintf("%.8f", btcAmount)
+		orderConfig.MarketMarketIoc.BaseSize = btcSizeStr
+		orderTypeDesc = fmt.Sprintf("%s BTC", btcSizeStr)
 	} else {
 		// For USD amount with SELL, we need to convert to base currency first
 		// We'll preview the order to get the equivalent BTC amount for the USD value
 		
 		// Create a temporary preview request with QuoteSize (for estimation only)
+		usdSizeStr := fmt.Sprintf("%.2f", usdAmount)
 		tempPreviewRequest := &orders.CreateOrderPreviewRequest{
 			ProductId: productId,
 			Side:      "SELL",
 			OrderConfiguration: model.OrderConfiguration{
 				MarketMarketIoc: &model.MarketIoc{
-					QuoteSize: usdAmount,
+					QuoteSize: usdSizeStr,
 				},
 			},
 		}
 
-		fmt.Printf("Getting BTC equivalent for $%s...\n", usdAmount)
+		fmt.Printf("Getting BTC equivalent for $%s...\n", usdSizeStr)
 		previewResp, err := ordersService.CreateOrderPreview(context.Background(), tempPreviewRequest)
 		if err != nil {
 			log.Fatalf("Failed to get BTC equivalent: %v", err)
@@ -153,11 +165,11 @@ func main() {
 		// Format to 8 decimal places
 		btcRounded := fmt.Sprintf("%.8f", btcFloat)
 		
-		fmt.Printf("$%s is approximately %s BTC at current market price\n", usdAmount, btcRounded)
+		fmt.Printf("$%s is approximately %s BTC at current market price\n", usdSizeStr, btcRounded)
 		
 		// Now use the rounded BaseSize for the actual order
 		orderConfig.MarketMarketIoc.BaseSize = btcRounded
-		orderTypeDesc = fmt.Sprintf("%s BTC (equivalent to $%s)", btcRounded, usdAmount)
+		orderTypeDesc = fmt.Sprintf("%s BTC (equivalent to $%s)", btcRounded, usdSizeStr)
 	}
 
 	// Optional: Preview the order first to see estimated cost/fees
