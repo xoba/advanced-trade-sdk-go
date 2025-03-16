@@ -18,13 +18,17 @@ The application and code are only available for demonstration purposes.
 
 ## Usage
 
-To use the *Advanced Trade Go SDK*, initialize the [Credentials](credentials.go) struct and create a new client. The Credentials struct is JSON
-enabled. Ensure that Advanced Trade API credentials are stored in a secure manner.
+There are multiple ways to initialize the *Advanced Trade Go SDK* with your credentials. Choose the approach that best fits your needs.
 
-```
-credentials := &credentials.Credentials{}
-if err := json.Unmarshal([]byte(os.Getenv("ADV_CREDENTIALS")), credentials); err != nil {
-    return nil, fmt.Errorf("unable to deserialize advanced trade credentials JSON: %w", err)
+### Option 1: Using Environment Variables for Credentials JSON
+
+You can use the JSON format in an environment variable:
+
+```go
+// Load credentials from ADV_CREDENTIALS environment variable
+credentials, err := credentials.ReadEnvCredentials("ADV_CREDENTIALS")
+if err != nil {
+    return nil, fmt.Errorf("unable to load credentials: %w", err)
 }
 
 httpClient, err := client.DefaultHttpClient()
@@ -35,27 +39,53 @@ if err != nil {
 restClient := client.NewRestClient(credentials, httpClient)
 ```
 
-There are convenience functions to read the credentials as an environment variable (credentials.ReadEnvCredentials) and to deserialize the JSON structure (credentials.UnmarshalCredentials) if pulled from a different source. The JSON format expected by both is:
+The JSON format expected is:
 
-```
+```json
 {
-  "accessKey": "",
-  "privatePemKey": ""
+  "accessKey": "your-api-key-name",
+  "privatePemKey": "-----BEGIN EC PRIVATE KEY-----\n...your private key...\n-----END EC PRIVATE KEY-----"
 }
 ```
 
-Coinbase Advanced Trade API credentials can be created in the [CDP web portal](https://portal.cdp.coinbase.com/). 
+### Option 2: Direct Credential Input
 
-Once the client is initialized, initialize a service to make the desired call. For example, to [list portfolios](https://github.com/coinbase-samples/advanced-trade-sdk-go/blob/main/list_portfolios.go),
-create the service, pass in the request object, check for an error, and if nil, process the response.
+You can also create the credentials struct directly:
 
+```go
+// Get credentials from environment variables or any other source
+keyName := os.Getenv("KEY_NAME")
+privateKey := os.Getenv("KEY_VALUE")
 
+// Create credentials manually
+credentials := &credentials.Credentials{
+    AccessKey:     keyName,
+    PrivatePemKey: privateKey,
+}
+
+httpClient, err := client.DefaultHttpClient()
+if err != nil {
+    panic(fmt.Sprintf("unable to load default http client: %v", err))
+}
+
+restClient := client.NewRestClient(credentials, httpClient)
 ```
-service := portfolios.NewPortfoliosService(restClient)
 
+### Getting Started
+
+Coinbase Advanced Trade API credentials can be created in the [CDP web portal](https://portal.cdp.coinbase.com/).
+
+Once the client is initialized, create a service for the specific API you want to use. For example, to [list portfolios](https://github.com/coinbase-samples/advanced-trade-sdk-go/blob/main/portfolios/list_portfolios.go):
+
+```go
+service := portfolios.NewPortfoliosService(restClient)
 
 response, err := service.ListPortfolios(ctx, &portfolios.ListPortfoliosRequest{})
 ```
+
+### Examples
+
+Check out the [example1](./example1) directory for a complete working example of selling Bitcoin at market price.
 
 ## Build
 
