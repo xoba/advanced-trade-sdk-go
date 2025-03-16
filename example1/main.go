@@ -144,11 +144,20 @@ func main() {
 			log.Fatalf("Failed to get BTC equivalent from preview")
 		}
 
-		fmt.Printf("$%s is approximately %s BTC at current market price\n", usdAmount, btcEquivalent)
+		// Round the BTC amount to 8 decimal places (Bitcoin's standard precision)
+		btcFloat, err := strconv.ParseFloat(btcEquivalent, 64)
+		if err != nil {
+			log.Fatalf("Failed to parse BTC equivalent: %v", err)
+		}
 		
-		// Now use the BaseSize for the actual order
-		orderConfig.MarketMarketIoc.BaseSize = btcEquivalent
-		orderTypeDesc = fmt.Sprintf("%s BTC (equivalent to $%s)", btcEquivalent, usdAmount)
+		// Format to 8 decimal places
+		btcRounded := fmt.Sprintf("%.8f", btcFloat)
+		
+		fmt.Printf("$%s is approximately %s BTC at current market price\n", usdAmount, btcRounded)
+		
+		// Now use the rounded BaseSize for the actual order
+		orderConfig.MarketMarketIoc.BaseSize = btcRounded
+		orderTypeDesc = fmt.Sprintf("%s BTC (equivalent to $%s)", btcRounded, usdAmount)
 	}
 
 	// Optional: Preview the order first to see estimated cost/fees
